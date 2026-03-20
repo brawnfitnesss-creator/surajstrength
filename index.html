@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Suraj Strength"/>
+<meta name="theme-color" content="#080808"/>
+<title>Suraj Strength System</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#080808;font-family:'Barlow Condensed',sans-serif;color:#fff;overflow:hidden}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input,select,button{font-family:'Barlow Condensed',sans-serif}
+select option{background:#111;color:#fff}
+.screen{position:fixed;inset:0;overflow:hidden;display:none;flex-direction:column}
+.screen.active{display:flex}
+#setup{background:#080808;align-items:center;justify-content:center;overflow-y:auto;padding:48px 24px env(safe-area-inset-bottom)}
+.logo-eyebrow{font-size:11px;letter-spacing:6px;color:#C9A84C;text-align:center;margin-bottom:6px}
+.logo-title{font-size:50px;font-weight:800;line-height:1;letter-spacing:2px;text-align:center}
+.logo-bar{width:60px;height:3px;background:#C9A84C;margin:14px auto 36px}
+.setup-label{font-size:10px;letter-spacing:4px;color:#444;text-align:center;margin-bottom:18px}
+.pr-card{background:#111;border:1px solid #1E1E1E;border-radius:14px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.pr-icon{font-size:26px}
+.pr-field{flex:1}
+.pr-lbl{font-size:9px;letter-spacing:3px;color:#444;margin-bottom:4px}
+.pr-inp{background:transparent;border:none;outline:none;color:#fff;font-size:28px;font-weight:700;width:90px}
+.pr-kg{color:#333;font-size:13px}
+.pr-tm{background:#1A1A1A;border-radius:8px;padding:6px 12px;font-size:11px;color:#C9A84C;letter-spacing:1px;white-space:nowrap;margin-left:auto}
+.start-btn{width:100%;margin-top:22px;padding:18px;background:#C9A84C;border:none;border-radius:14px;font-size:15px;font-weight:800;letter-spacing:4px;color:#000;cursor:pointer}
+.topbar{flex-shrink:0;background:#080808;border-bottom:1px solid #111;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top))}
+.topbar-row{display:flex;align-items:center;justify-content:space-between}
+.topbar-eyebrow{font-size:9px;letter-spacing:4px;color:#333}
+.topbar-title{font-size:19px;font-weight:800;letter-spacing:1px;line-height:1.1}
+.topbar-right{text-align:right}
+.topbar-rlabel{font-size:9px;letter-spacing:2px;color:#333}
+.topbar-count{font-size:22px;font-weight:800;line-height:1}
+.week-scroll{flex-shrink:0;display:flex;gap:8px;overflow-x:auto;padding:12px 16px 8px;scrollbar-width:none}
+.week-scroll::-webkit-scrollbar{display:none}
+.wtab{flex:0 0 auto;padding:9px 18px;border-radius:10px;cursor:pointer;border:1px solid #1A1A1A;background:#0F0F0F}
+.wtab-num{font-size:11px;font-weight:700;letter-spacing:2px}
+.wtab.active .wtab-num{color:#000}
+.wtab:not(.active) .wtab-num{color:#555}
+.wtab-phase{font-size:8px;letter-spacing:1px;margin-top:2px}
+.wtab.active .wtab-phase{color:#00000055}
+.wtab:not(.active) .wtab-phase{color:#2A2A2A}
+.day-tabs{flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px 12px}
+.dtab{padding:10px 4px;border-radius:10px;cursor:pointer;border:1px solid #1A1A1A;background:#0F0F0F;text-align:center}
+.dtab-icon{font-size:19px}
+.dtab-label{font-size:9px;font-weight:700;letter-spacing:1px;margin-top:4px}
+.dtab.active .dtab-label{color:#000}
+.dtab:not(.active) .dtab-label{color:#444}
+.dtab.complete:not(.active) .dtab-label{color:#27AE60}
+.dtab-count{font-size:8px;margin-top:2px}
+.dtab.active .dtab-count{color:#00000055}
+.dtab:not(.active) .dtab-count{color:#2A2A2A}
+.dtab.complete:not(.active) .dtab-count{color:#1E5A24}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scroll-inner{padding-bottom:calc(32px + env(safe-area-inset-bottom))}
+.day-hdr{padding:16px 16px 14px;border-bottom:1px solid #111;margin-bottom:14px}
+.day-hdr-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.day-icon-box{width:46px;height:46px;border-radius:12px;background:#111;border:1px solid #1E1E1E;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.day-eyebrow{font-size:10px;letter-spacing:4px}
+.day-name{font-size:22px;font-weight:800;letter-spacing:1px;line-height:1.1}
+.day-sub{font-size:11px;color:#444;margin-top:1px}
+.prog-row{display:flex;justify-content:space-between;margin-bottom:6px}
+.prog-label{font-size:9px;letter-spacing:2px;color:#333}
+.prog-count{font-size:10px;letter-spacing:1px;font-weight:700}
+.prog-track{height:4px;background:#1A1A1A;border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width .35s ease}
+.ex-card{background:#0F0F0F;border:1px solid #1A1A1A;border-radius:16px;margin:0 16px 14px;overflow:hidden}
+.ex-card.all-done{background:#0A1A10;border-color:#1A3A20}
+.ex-hdr{padding:14px 14px 10px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #151515}
+.ex-name{font-size:17px;font-weight:800;letter-spacing:.5px;line-height:1.2}
+.ex-card.all-done .ex-name{color:#27AE60}
+.weak-badge{display:inline-block;font-size:7px;letter-spacing:2px;color:#C9A84C;background:#1A1500;border:1px solid #C9A84C;border-radius:4px;padding:2px 5px;margin-left:7px;vertical-align:middle;line-height:1.4}
+.ex-meta{font-size:10px;color:#333;letter-spacing:2px;margin-top:3px}
+.ex-pct{color:#C9A84C;margin-left:6px}
+.ring-wrap{position:relative;width:42px;height:42px;flex-shrink:0}
+.ring-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800}
+
+/* ── SETS TABLE ── */
+.sets-wrap{padding:0 12px 12px}
+.tbl-header{display:grid;gap:6px;padding:8px 2px 6px;border-bottom:1px solid #1A1A1A;margin-bottom:4px}
+.tbl-lbl{font-size:8px;letter-spacing:2px;color:#2E2E2E;text-align:center}
+.set-row{display:grid;gap:6px;align-items:center;padding:8px 2px;border-bottom:1px solid #111}
+.set-row:last-child{border-bottom:none}
+.set-row.done-row{background:rgba(39,174,96,0.05);border-radius:10px;padding:8px 6px;margin:0 -6px}
+
+/* grid: SET-bubble | WT-input | REPS-input | DONE-btn */
+.tbl-header,.set-row{grid-template-columns:28px 1fr 56px 32px}
+
+.set-bubble{width:28px;height:28px;border-radius:7px;background:#1A1A1A;border:1px solid #252525;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#3A3A3A}
+.set-row.done-row .set-bubble{background:#0D3320;border-color:#27AE60;color:#27AE60}
+
+.wt-cell{background:#141414;border:1px solid #1E1E1E;border-radius:9px;padding:6px 10px}
+.wt-cell:focus-within{border-color:#C9A84C44}
+.cell-lbl{font-size:7px;letter-spacing:2px;color:#2E2E2E;margin-bottom:2px}
+.wt-inp{background:transparent;border:none;outline:none;color:#fff;font-size:21px;font-weight:700;width:100%;line-height:1}
+.wt-inp.pr-hi{color:#F0D080}
+.wt-target{font-size:8px;color:#272727;margin-top:1px}
+
+.reps-cell{background:#141414;border:1px solid #1E1E1E;border-radius:9px;padding:6px 8px;text-align:center}
+.reps-cell:focus-within{border-color:#C9A84C44}
+.reps-inp{background:transparent;border:none;outline:none;font-size:21px;font-weight:700;width:100%;text-align:center;line-height:1;color:#fff}
+.reps-inp.missed{color:#FF4444}
+.reps-inp.nailed{color:#27AE60}
+
+.done-btn{width:32px;height:32px;border-radius:8px;background:#141414;border:2px solid #1E1E1E;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:transparent;flex-shrink:0}
+.done-btn.on{background:#27AE60;border-color:#27AE60;color:#fff}
+
+/* ── SUMMARY STRIP ── */
+.ex-summary{display:flex;gap:6px;padding:10px 12px;background:#0A0A0A;border-top:1px solid #111;flex-wrap:wrap}
+.chip{flex:1;min-width:70px;background:#111;border:1px solid #1A1A1A;border-radius:8px;padding:6px 8px;text-align:center}
+.chip-lbl{font-size:7px;letter-spacing:2px;color:#333}
+.chip-val{font-size:15px;font-weight:800;display:block;margin-top:2px;letter-spacing:0}
+.chip-val.gd{color:#C9A84C}
+.chip-val.ok{color:#27AE60}
+.chip-val.no{color:#FF5555}
+</style>
+</head>
+<body>
+
+<div class="screen active" id="setup">
+  <div class="logo-eyebrow">SURAJ</div>
+  <div class="logo-title">STRENGTH<br/>SYSTEM</div>
+  <div class="logo-bar"></div>
+  <div class="setup-label">ENTER YOUR 1 REP MAXES</div>
+  <div id="pr-cards"></div>
+  <button class="start-btn" onclick="go()">START PROGRAM ⚡</button>
+</div>
+
+<div class="screen" id="app">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div>
+        <div class="topbar-eyebrow">SURAJ STRENGTH SYSTEM</div>
+        <div class="topbar-title" id="tb-title">WEEK 1</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-rlabel">WEEK DONE</div>
+        <div class="topbar-count" id="tb-count">0<span style="color:#222;font-size:13px">/0</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="week-scroll" id="week-tabs"></div>
+  <div class="day-tabs" id="day-tabs"></div>
+  <div class="scroll-area"><div class="scroll-inner" id="day-content"></div></div>
+</div>
+
+<script>
+const GOLD="#C9A84C";
+const WM={
+  1:{phase:"BASE BUILDING",  color:"#C9A84C",bump:0},
+  2:{phase:"PROGRESSION",    color:"#C9A84C",bump:.025},
+  3:{phase:"INTENSITY PEAK", color:"#C9A84C",bump:.05},
+  4:{phase:"DELOAD",         color:"#6B9F6B",bump:-.05},
+  5:{phase:"VOLUME PEAK",    color:"#C9A84C",bump:.075},
+  6:{phase:"STRENGTH PEAK",  color:"#E8C060",bump:.1},
+};
+const DM={
+  1:{name:"LOWER POWER",      icon:"🦵",sub:"Quad + Hamstring"},
+  2:{name:"UPPER POWER",      icon:"💪",sub:"Chest + Shoulders"},
+  3:{name:"POSTERIOR CHAIN",  icon:"🏋️",sub:"Back + Deadlift"},
+  4:{name:"UPPER HYPERTROPHY",icon:"💎",sub:"Arms + Side Delts"},
+};
+const PROG=[
+  {day:1,ex:"Back Squat",                sets:4,reps:6, pct:.75,tm:"squat",   weak:0},
+  {day:1,ex:"Romanian Deadlift",         sets:3,reps:10,pct:.60,tm:"dl",      weak:0},
+  {day:1,ex:"Leg Press",                 sets:3,reps:12,pct:0,  tm:"",        weak:0},
+  {day:1,ex:"Leg Curl (Machine)",        sets:3,reps:12,pct:0,  tm:"",        weak:0},
+  {day:1,ex:"Lateral Raise",             sets:4,reps:15,pct:0,  tm:"",        weak:1},
+  {day:1,ex:"Weighted Crunch",           sets:3,reps:15,pct:0,  tm:"",        weak:1},
+  {day:2,ex:"Bench Press",               sets:4,reps:6, pct:.75,tm:"bench",   weak:0},
+  {day:2,ex:"Overhead Press",            sets:3,reps:8, pct:.70,tm:"ohp",     weak:0},
+  {day:2,ex:"Incline DB Press",          sets:3,reps:10,pct:0,  tm:"",        weak:0},
+  {day:2,ex:"Cable Lateral Raise",       sets:4,reps:15,pct:0,  tm:"",        weak:1},
+  {day:2,ex:"EZ-Bar Curl",               sets:3,reps:12,pct:0,  tm:"",        weak:1},
+  {day:2,ex:"Overhead Tricep Extension", sets:3,reps:12,pct:0,  tm:"",        weak:1},
+  {day:3,ex:"Deadlift",                  sets:4,reps:5, pct:.80,tm:"dl",      weak:0},
+  {day:3,ex:"Barbell Row",               sets:4,reps:8, pct:.65,tm:"bench",   weak:0},
+  {day:3,ex:"Pull-Up / Lat Pulldown",    sets:3,reps:10,pct:0,  tm:"",        weak:0},
+  {day:3,ex:"Face Pull",                 sets:3,reps:15,pct:0,  tm:"",        weak:1},
+  {day:3,ex:"Hammer Curl",               sets:3,reps:12,pct:0,  tm:"",        weak:1},
+  {day:3,ex:"Cable Crunch",              sets:3,reps:15,pct:0,  tm:"",        weak:1},
+  {day:4,ex:"Front Squat",               sets:3,reps:6, pct:.70,tm:"squat",   weak:0},
+  {day:4,ex:"Bench Press (Paused)",      sets:3,reps:6, pct:.70,tm:"bench",   weak:0},
+  {day:4,ex:"DB Lateral Raise",          sets:5,reps:15,pct:0,  tm:"",        weak:1},
+  {day:4,ex:"Incline DB Curl",           sets:3,reps:12,pct:0,  tm:"",        weak:1},
+  {day:4,ex:"Skull Crushers",            sets:3,reps:12,pct:0,  tm:"",        weak:1},
+  {day:4,ex:"Hanging Leg Raise",         sets:3,reps:15,pct:0,  tm:"",        weak:1},
+];
+
+let prs={squat:100,bench:80,dl:140,ohp:60};
+let cW=1,cD=1,LOG={};
+
+function tm(k){return Math.round(prs[k]*.9/2.5)*2.5;}
+function tgt(pct,tmk,wk){
+  if(!pct||!tmk)return null;
+  return Math.round(tm(tmk)*(pct+WM[wk].bump)/2.5)*2.5;
+}
+function eid(ex){return ex.replace(/[\s\/\(\)\.]/g,"_");}
+
+function initLog(){
+  LOG={};
+  for(let w=1;w<=6;w++){LOG[w]={};
+    for(let d=1;d<=4;d++){LOG[w][d]={};
+      PROG.filter(e=>e.day===d).forEach(e=>{
+        LOG[w][d][e.ex]=Array.from({length:e.sets},()=>({wt:"",reps:"",done:false}));
+      });
+    }
+  }
+}
+
+function wkCnt(w){
+  let dn=0,tot=0;
+  for(let d=1;d<=4;d++) PROG.filter(e=>e.day===d).forEach(e=>{
+    LOG[w][d][e.ex].forEach(s=>{dn+=s.done?1:0;tot++;});
+  });
+  return{dn,tot};
+}
+function dyCnt(w,d){
+  let dn=0,tot=0;
+  PROG.filter(e=>e.day===d).forEach(e=>{
+    LOG[w][d][e.ex].forEach(s=>{dn+=s.done?1:0;tot++;});
+  });
+  return{dn,tot};
+}
+
+// ── SETUP ────────────────────────────────────────────────────────────────────
+function renderSetup(){
+  document.getElementById("pr-cards").innerHTML=[
+    {key:"squat",label:"SQUAT",icon:"🏋️"},
+    {key:"bench",label:"BENCH PRESS",icon:"💪"},
+    {key:"dl",   label:"DEADLIFT",icon:"⚡"},
+    {key:"ohp",  label:"OVERHEAD PRESS",icon:"🔱"},
+  ].map(({key,label,icon})=>`
+    <div class="pr-card">
+      <div class="pr-icon">${icon}</div>
+      <div class="pr-field">
+        <div class="pr-lbl">${label}</div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <input class="pr-inp" type="number" inputmode="decimal" value="${prs[key]}"
+            oninput="prs['${key}']=+this.value||0;document.getElementById('tm${key}').textContent='TM: '+Math.round(prs['${key}']*.9/2.5)*2.5+' kg'"/>
+          <span class="pr-kg">kg</span>
+        </div>
+      </div>
+      <div class="pr-tm" id="tm${key}">TM: ${tm(key)} kg</div>
+    </div>`).join("");
+}
+
+function go(){
+  initLog();
+  document.getElementById("setup").classList.remove("active");
+  document.getElementById("app").classList.add("active");
+  renderAll();
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderAll(){renderTopbar();renderWkTabs();renderDyTabs();renderDay();}
+
+function renderTopbar(){
+  const w=WM[cW];
+  document.getElementById("tb-title").textContent=`WEEK ${cW} — ${w.phase}`;
+  document.getElementById("tb-title").style.color=w.color;
+  const{dn,tot}=wkCnt(cW);
+  document.getElementById("tb-count").innerHTML=
+    `<span style="color:${dn===tot&&tot>0?'#27AE60':w.color}">${dn}</span><span style="color:#222;font-size:13px">/${tot}</span>`;
+}
+
+function renderWkTabs(){
+  document.getElementById("week-tabs").innerHTML=[1,2,3,4,5,6].map(w=>`
+    <div class="wtab ${w===cW?'active':''}"
+      style="${w===cW?'background:'+WM[w].color+';border-color:'+WM[w].color:''}"
+      onclick="swWk(${w})">
+      <div class="wtab-num">WK ${w}</div>
+      <div class="wtab-phase">${WM[w].phase.split(" ")[0]}</div>
+    </div>`).join("");
+}
+
+function renderDyTabs(){
+  const wc=WM[cW].color;
+  document.getElementById("day-tabs").innerHTML=[1,2,3,4].map(d=>{
+    const{dn,tot}=dyCnt(cW,d);
+    const full=dn===tot&&tot>0,act=d===cD;
+    return`<div class="dtab ${act?'active':''} ${full&&!act?'complete':''}"
+      style="${act?'background:'+wc+';border-color:'+wc:''}"
+      onclick="swDy(${d})">
+      <div class="dtab-icon">${DM[d].icon}</div>
+      <div class="dtab-label">DAY ${d}</div>
+      <div class="dtab-count">${dn}/${tot}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderDay(){
+  const w=cW,d=cD,wm=WM[w],dm=DM[d];
+  const{dn,tot}=dyCnt(w,d);
+  const pct=tot?dn/tot:0,full=dn===tot&&tot>0;
+  const C=2*Math.PI*17;
+
+  let h=`<div class="day-hdr">
+    <div class="day-hdr-top">
+      <div class="day-icon-box">${dm.icon}</div>
+      <div>
+        <div class="day-eyebrow" style="color:${wm.color}">DAY ${d}</div>
+        <div class="day-name">${dm.name}</div>
+        <div class="day-sub">${dm.sub}</div>
+      </div>
+    </div>
+    <div class="prog-row">
+      <span class="prog-label">SESSION PROGRESS</span>
+      <span class="prog-count" style="color:${full?'#27AE60':wm.color}">${dn} / ${tot} SETS</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" style="width:${pct*100}%;background:${full?'#27AE60':wm.color}"></div></div>
+  </div>`;
+
+  PROG.filter(e=>e.day===d).forEach(ex=>{
+    const sets=LOG[w][d][ex.ex];
+    const exDn=sets.filter(s=>s.done).length,allDn=exDn===sets.length;
+    const tarWt=tgt(ex.pct,ex.tm,w);
+    const adjPct=ex.pct?Math.round((ex.pct+wm.bump)*100):0;
+    const id=eid(ex.ex);
+
+    // stats
+    const wts=sets.map(s=>parseFloat(s.wt)).filter(v=>!isNaN(v)&&v>0);
+    const rps=sets.map(s=>parseInt(s.reps)).filter(v=>!isNaN(v)&&v>0);
+    const maxWt=wts.length?Math.max(...wts):null;
+    const avgR=rps.length?(rps.reduce((a,b)=>a+b,0)/rps.length).toFixed(1):null;
+    const vol=sets.reduce((a,s)=>{const wv=parseFloat(s.wt)||0,rv=parseInt(s.reps)||0;return a+wv*rv;},0);
+
+    // set rows
+    const rows=sets.map((s,i)=>{
+      const aw=parseFloat(s.wt)||0,rd=parseInt(s.reps)||0;
+      const isPR=aw>0&&tarWt&&aw>tarWt;
+      const missed=rd>0&&rd<ex.reps,nailed=rd>0&&rd>=ex.reps;
+      return`<div class="set-row ${s.done?'done-row':''}" id="sr-${id}-${i}">
+        <div class="set-bubble">${i+1}</div>
+        <div class="wt-cell">
+          <div class="cell-lbl">WEIGHT (kg)</div>
+          <input class="wt-inp ${isPR?'pr-hi':''}" type="number" inputmode="decimal"
+            value="${s.wt}" placeholder="${tarWt??'DB'}"
+            onchange="upd('${ex.ex}',${i},'wt',this.value)"/>
+          ${tarWt?`<div class="wt-target">target: ${tarWt} kg</div>`:''}
+        </div>
+        <div class="reps-cell">
+          <div class="cell-lbl">REPS</div>
+          <input class="reps-inp ${missed?'missed':nailed?'nailed':''}" type="number" inputmode="numeric"
+            value="${s.reps}" placeholder="${ex.reps}"
+            onchange="upd('${ex.ex}',${i},'reps',this.value)"/>
+        </div>
+        <button class="done-btn ${s.done?'on':''}" onclick="tog('${ex.ex}',${i})">✓</button>
+      </div>`;
+    }).join("");
+
+    const summaryHtml=(wts.length||rps.length)?`
+      <div class="ex-summary">
+        ${maxWt!==null?`<div class="chip"><div class="chip-lbl">BEST SET</div><span class="chip-val gd">${maxWt} kg</span></div>`:''}
+        ${avgR!==null?`<div class="chip"><div class="chip-lbl">AVG REPS</div><span class="chip-val ${parseFloat(avgR)>=ex.reps?'ok':'no'}">${avgR}</span></div>`:''}
+        ${vol>0?`<div class="chip"><div class="chip-lbl">VOLUME</div><span class="chip-val gd">${vol.toLocaleString()} kg</span></div>`:''}
+        <div class="chip"><div class="chip-lbl">SETS DONE</div><span class="chip-val ${allDn?'ok':''}">${exDn}/${sets.length}</span></div>
+      </div>`:'';
+
+    h+=`<div class="ex-card ${allDn?'all-done':''}" id="exc-${id}">
+      <div class="ex-hdr">
+        <div style="flex:1;min-width:0">
+          <div class="ex-name">${ex.ex}${ex.weak?'<span class="weak-badge">WEAK POINT</span>':''}</div>
+          <div class="ex-meta">${sets.length} SETS × ${ex.reps} REPS${adjPct?`<span class="ex-pct">${adjPct}% TM</span>`:''}</div>
+        </div>
+        <div class="ring-wrap" style="margin-left:10px">
+          <svg width="42" height="42" style="transform:rotate(-90deg)">
+            <circle cx="21" cy="21" r="17" fill="none" stroke="#1A1A1A" stroke-width="3"/>
+            <circle cx="21" cy="21" r="17" fill="none" stroke="${allDn?'#27AE60':'#C9A84C'}"
+              stroke-width="3" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-exDn/sets.length)}"
+              stroke-linecap="round"/>
+          </svg>
+          <div class="ring-inner" style="color:${allDn?'#27AE60':'#C9A84C'}">${exDn}/${sets.length}</div>
+        </div>
+      </div>
+      <div class="sets-wrap">
+        <div class="tbl-header">
+          <div class="tbl-lbl">SET</div>
+          <div class="tbl-lbl">WEIGHT (kg)</div>
+          <div class="tbl-lbl">REPS</div>
+          <div class="tbl-lbl">✓</div>
+        </div>
+        ${rows}
+      </div>
+      ${summaryHtml}
+    </div>`;
+  });
+
+  document.getElementById("day-content").innerHTML=h;
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────────
+function swWk(w){cW=w;cD=1;renderAll();document.querySelector(".scroll-area").scrollTop=0;}
+function swDy(d){cD=d;renderDyTabs();renderDay();document.querySelector(".scroll-area").scrollTop=0;}
+function upd(ex,i,f,v){LOG[cW][cD][ex][i][f]=v;renderTopbar();renderDyTabs();renderDay();}
+function tog(ex,i){LOG[cW][cD][ex][i].done^=true;renderTopbar();renderDyTabs();renderDay();}
+
+renderSetup();
+</script>
+</body>
+</html>
